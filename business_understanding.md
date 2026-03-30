@@ -92,8 +92,6 @@ Proyek ini dirancang sebagai proyek *end-to-end data science* yang mencakup selu
 
 ## 5. Business Dashboard
 
----
-
 ### 5.1 Akses Dashboard
 
 | Akses | Detail |
@@ -260,5 +258,34 @@ Dashboard ini berhasil menjawab 5 pertanyaan bisnis utama yang ditetapkan di awa
 | Profil karyawan berisiko tinggi? | Terlihat di tabel Top 50 High Risk |
 | Seberapa akurat prediksi model? | Recall 0.75, ROC-AUC 0.83 |
 | Intervensi HR yang efektif? | Kontrol overtime, naikkan gaji < 3K, program retensi muda |
+
+---
+
+## 6. Conclusion
+
+---
+
+## 7. Rekomendasi Action Items
+
+Berdasarkan hasil analisis model prediksi *attrition* dan identifikasi faktor-faktor paling berpengaruh, berikut adalah rekomendasi *action items* yang dapat dilakukan oleh departemen HR Jaya Jaya Maju untuk menurunkan *attrition rate*:
+
+---
+
+#### 1. Targeted Retention Program (Prioritas Utama)
+*   **Fokus:** Prioritaskan intervensi pada **46 karyawan yang teridentifikasi `High Risk`** (probabilitas resign > 0.6) dari hasil prediksi model. Lakukan pertemuan *one-on-one* untuk memahami kekhawatiran dan kebutuhan mereka secara personal.
+*   **Aksi:** Tawarkan solusi personal seperti jalur pengembangan karir yang lebih jelas, mentoring, penyesuaian beban kerja, atau evaluasi kompensasi.
+
+#### 2. Pengembangan Karir & Mentoring
+*   **Fokus:** Karyawan muda (terutama di bawah 30 tahun) dan karyawan pada *job role* berisiko tinggi (misalnya `Sales Representative`, `Laboratory Technician`).
+*   **Aksi:** Sediakan program *mentorship*, pelatihan keterampilan (*upskilling/reskilling*), dan kesempatan pengembangan karir yang transparan untuk meningkatkan keterlibatan dan prospek masa depan mereka di perusahaan.
+
+#### 3. Peningkatan Kompensasi & Benefit
+*   **Fokus:** Karyawan dengan `MonthlyIncome` yang relatif rendah, terutama jika mereka teridentifikasi berisiko tinggi.
+*   **Aksi:** Lakukan studi *salary benchmark* secara berkala untuk memastikan kompensasi kompetitif. Pertimbangkan penyesuaian gaji atau penawaran benefit lain yang menarik untuk *job role* tertentu.
+*   **Insight:** Tingkat `StockOptionLevel` yang rendah juga menjadi faktor. Evaluasi program kepemilikan saham karyawan jika ada, atau cara lain untuk meningkatkan rasa kepemilikan.
+
+#### 4. Manajemen Beban Kerja & Keseimbangan Hidup-Kerja (Work-Life Balance)
+*   **Fokus:** Karyawan yang sering lembur (`OverTime = Yes`) dan mereka yang menunjukkan `WorkLifeBalance` atau `JobInvolvement` rendah.
+*   **Aksi:** Terapkan kebijakan yang lebih ketat atau memberikan kompensasi yang adil untuk lembur. Adakan program *well-being* karyawan, fleksibilitas jam kerja, atau opsi kerja *hybrid* untuk mengurangi *burnout* dan meningkatkan keseimbangan hidup-kerja.
 
 ---
