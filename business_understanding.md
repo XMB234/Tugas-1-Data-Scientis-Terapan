@@ -272,7 +272,7 @@ Berdasarkan hasil analisis model prediksi *attrition* dan identifikasi faktor-fa
 ---
 
 #### 1. Targeted Retention Program (Prioritas Utama)
-*   **Fokus:** Prioritaskan intervensi pada **46 karyawan yang teridentifikasi `High Risk`** (probabilitas resign > 0.6) dari hasil prediksi model. Lakukan pertemuan *one-on-one* untuk memahami kekhawatiran dan kebutuhan mereka secara personal.
+*   **Fokus:** Prioritaskan intervensi pada **248 karyawan yang teridentifikasi `High Risk`**. Lakukan pertemuan *one-on-one* untuk memahami kekhawatiran dan kebutuhan mereka secara personal.
 *   **Aksi:** Tawarkan solusi personal seperti jalur pengembangan karir yang lebih jelas, mentoring, penyesuaian beban kerja, atau evaluasi kompensasi.
 
 #### 2. Pengembangan Karir & Mentoring
