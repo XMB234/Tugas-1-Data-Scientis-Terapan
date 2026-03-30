@@ -88,13 +88,177 @@ Proyek ini dirancang sebagai proyek *end-to-end data science* yang mencakup selu
 - Kolom `EmployeeCount`, `Over18`, dan `StandardHours` dikonfirmasi sebagai fitur konstan dan akan di-drop pada tahap preprocessing.
 - Model yang dibangun ditujukan untuk mendukung keputusan HR, bukan sebagai pengganti pertimbangan manusiawi.
 
-### 3.4 Target Keberhasilan Proyek
+---
 
-| Komponen | Target |
-|---|---|
-| Model ML | ROC-AUC ≥ 0,80 |
-| Business Dashboard | Minimal 6 dimensi analisis attrition secara interaktif |
-| Rekomendasi Bisnis | Minimal 5 rekomendasi konkret dan terukur |
+## 5. Business Dashboard
 
 ---
 
+### 5.1 Akses Dashboard
+
+| Akses | Detail |
+|---|---|
+| URL | `http://localhost:3000` |
+| Email | `root@mail.com` |
+| Password | `root123` |
+
+---
+
+### 5.2 Gambaran Umum Dashboard
+
+Dashboard ini dirancang untuk membantu **Manajer HR PT Jaya Jaya Maju** dalam memonitor dan memahami faktor-faktor yang mempengaruhi tingginya attrition rate perusahaan. Dashboard terdiri dari **13 visualisasi** yang dibagi ke dalam 5 bagian utama, mencakup data **1.470 karyawan** — gabungan dari 1.058 data berlabel aktual dan 412 data hasil prediksi model Machine Learning (Logistic Regression, Recall=0.75, ROC-AUC=0.83).
+
+---
+
+### 5.3 Fitur Filter Interaktif
+
+Di bagian paling atas dashboard terdapat **4 filter interaktif** yang memungkinkan HR melihat data dari berbagai sudut pandang:
+
+| Filter | Variabel | Nilai yang Bisa Diketik |
+|---|---|---|
+| Departemen | `filter_department` | `Human Resources` · `Research & Development` · `Sales` |
+| Risk Level | `filter_risklevel` | `High Risk` · `Medium Risk` · `Low Risk` |
+| Overtime | `filter_overtime` | `Yes` · `No` |
+| Kelompok Usia | `filter_agegroup` | `18-25` · `26-35` · `36-45` · `46-60` |
+
+Saat salah satu filter diisi, **seluruh visualisasi di dashboard akan otomatis menyesuaikan** dan hanya menampilkan data sesuai segmen yang dipilih. Kosongkan filter untuk kembali ke tampilan keseluruhan 1.470 karyawan.
+
+---
+
+### 5.4 Bagian 1 — KPI Summary (4 Kartu Angka)
+
+Baris pertama berisi 4 KPI utama yang memberikan gambaran cepat kondisi attrition perusahaan.
+
+#### 5.4.1 Total Karyawan: **1.470**
+Jumlah total seluruh karyawan dalam dataset, mencakup 1.058 data berlabel aktual dan 412 data yang diprediksi oleh model ML.
+
+#### 5.4.2 Attrition Rate Aktual (%): **16.9**
+Persentase karyawan yang benar-benar telah resign berdasarkan data berlabel. Angka ini jauh melampaui target maksimal perusahaan sebesar 10%, menunjukkan adanya masalah retensi yang perlu segera ditangani.
+
+#### 5.4.3 Total Prediksi Resign (Aktual + Model ML): **235**
+Gabungan karyawan yang sudah resign (data aktual) dan karyawan yang diprediksi akan resign oleh model ML. Angka ini mencerminkan **total risiko resign** yang dihadapi perusahaan saat ini.
+
+#### 5.4.4 Karyawan High Risk: **248**
+Jumlah karyawan yang masuk kategori High Risk berdasarkan RiskScore — kombinasi faktor overtime, gaji rendah, job involvement rendah, environment satisfaction rendah, work-life balance buruk, tidak punya stock option, masa kerja singkat, dan sering perjalanan dinas. Karyawan ini membutuhkan **intervensi HR segera**.
+
+---
+
+### 5.5 Bagian 2 — Distribusi Populasi (2 Pie Chart)
+
+#### 5.5.1 Proporsi Stay vs Resign — 1.470 Karyawan
+Pie chart ini menampilkan proporsi karyawan yang Stay (84%) vs Resign (16%) dari keseluruhan 1.470 karyawan, menggunakan kolom `Attrition_Combined_Label` yang menggabungkan data aktual dan prediksi model ML. Ketidakseimbangan kelas yang signifikan (rasio 5:1) inilah yang menjadi alasan penggunaan SMOTE saat training model.
+
+#### 5.5.2 Distribusi Risk Level — 1.470 Karyawan
+Pie chart ini menampilkan distribusi tingkat risiko seluruh karyawan:
+- **Low Risk: 44.2%** (649 karyawan) — aman, monitoring rutin bulanan
+- **Medium Risk: 38.9%** (572 karyawan) — perlu monitoring aktif 2 minggu sekali
+- **High Risk: 16.9%** (248 karyawan) — perlu tindakan segera dalam 5 hari kerja
+
+---
+
+### 5.6 Bagian 3 — Analisis per Job Role & Departemen
+
+#### 5.6.1 Attrition Rate per Job Role (%)
+Bar chart horizontal ini menampilkan attrition rate untuk setiap posisi jabatan, diurutkan dari tertinggi ke terendah:
+
+| Job Role | Attrition Rate | Interpretasi |
+|---|---|---|
+| Sales Representative | **43.1%** | Kritis — hampir separuh resign |
+| Laboratory Technician | **26.1%** | Sangat tinggi |
+| Human Resources | **20.0%** | Tinggi |
+| Research Scientist | **17.8%** | Di atas rata-rata |
+| Sales Executive | **16.8%** | Di atas rata-rata |
+| Healthcare Representative | **9.1%** | Mendekati target |
+| Manufacturing Director | **6.5%** | Baik |
+| Manager | **6.3%** | Baik |
+| Research Director | **3.2%** | Sangat baik |
+
+Sales Representative menjadi posisi paling kritis dengan attrition rate 43.1% — hampir 3x rata-rata perusahaan. Ini mengindikasikan perlunya evaluasi khusus pada kondisi kerja, kompensasi, dan beban kerja di posisi ini.
+
+#### 5.6.2 Attrition Rate per Departemen (%)
+Bar chart ini menampilkan perbandingan attrition rate antar departemen:
+- **Sales: 20.7%** — tertinggi, jauh di atas rata-rata
+- **Human Resources: 15.8%** — di atas rata-rata
+- **Research & Development: 15.3%** — sedikit di bawah rata-rata
+
+Departemen Sales menjadi prioritas utama intervensi karena kombinasi attrition rate tertinggi dan jumlah karyawan yang signifikan (446 orang).
+
+---
+
+### 5.7 Bagian 4 — Analisis Faktor Risiko
+
+#### 5.7.1 Attrition Rate per Kelompok Gaji (%)
+Bar chart ini membuktikan korelasi negatif yang kuat antara gaji dan attrition:
+- **< 3K: 28.7%** — hampir 3x rata-rata perusahaan
+- **3K–6K: 15.1%** — sedikit di bawah rata-rata
+- **6K–10K: 11.7%** — mendekati target
+- **> 10K: 9.1%** — sudah di bawah target 10%
+
+Karyawan bergaji rendah (< 3K) memiliki risiko resign paling tinggi. Ini menjadi dasar rekomendasi salary benchmarking dan penyesuaian struktur gaji minimum.
+
+#### 5.7.2 Attrition Rate per Kelompok Usia (%)
+Bar chart ini menampilkan pola attrition berdasarkan kelompok usia:
+- **18–25 tahun: 38%** — sangat kritis, fase adaptasi awal karier
+- **26–35 tahun: 19.5%** — masih di atas rata-rata
+- **36–45 tahun: 11%** — mendekati target
+- **46–60 tahun: 11.6%** — mendekati target
+
+Karyawan muda (18–25 tahun) memiliki risiko resign tertinggi, mengindikasikan perlunya program onboarding yang lebih kuat dan jalur karier yang jelas untuk generasi awal.
+
+#### 5.7.3 Dampak Overtime terhadap Attrition (%)
+Bar chart ini menampilkan salah satu temuan paling signifikan:
+- **Overtime Yes: 31.9%** — hampir 3x lipat
+- **Overtime No: 10.8%** — sudah di bawah target perusahaan
+
+Selisih 21.1 percentage points ini menjadikan overtime sebagai **faktor risiko tunggal terbesar** yang mempengaruhi attrition. Dari 307 karyawan yang overtime, 98 di antaranya resign.
+
+---
+
+### 5.8 Bagian 5 — Analisis Prediktif
+
+#### 5.8.1 Distribusi Probabilitas Resign Karyawan
+Bar chart ini menampilkan distribusi probabilitas resign hasil model ML untuk seluruh 1.470 karyawan:
+- **Sangat Rendah (< 0.2): 1.172 karyawan** — mayoritas relatif aman
+- **Rendah (0.2–0.4): 46 karyawan** — monitoring ringan
+- **Sedang (0.4–0.6): 27 karyawan** — perlu perhatian
+- **Tinggi (0.6–0.8): 18 karyawan** — risiko serius
+- **Sangat Tinggi (≥ 0.8): 207 karyawan** — intervensi mendesak
+
+207 karyawan dengan probabilitas resign ≥ 80% menjadi prioritas utama tindakan HR dalam jangka pendek.
+
+#### 5.8.2 Top 50 Karyawan Berisiko Tinggi (Tabel)
+Tabel ini menampilkan 50 karyawan dengan RiskScore dan Resign_Probability tertinggi, dilengkapi informasi:
+- Data demografis: usia, departemen, jabatan
+- Kondisi kerja: gaji bulanan, overtime, masa kerja
+- Tingkat kepuasan: job satisfaction, environment satisfaction
+- Status prediksi: status aktual (jika berlabel) dan status prediksi model ML
+
+Dari tabel terlihat pola konsisten — karyawan berisiko tinggi umumnya berasal dari R&D (Laboratory Technician) dan Sales (Sales Representative), bergaji di bawah 3.000, melakukan overtime, dan memiliki job satisfaction serta environment satisfaction yang rendah.
+
+---
+
+### 5.9 Panduan Filter
+
+```
+Departemen : Human Resources | Research & Development | Sales
+Risk Level : High Risk | Medium Risk | Low Risk
+Overtime   : Yes | No
+Kel. Usia  : 18-25 | 26-35 | 36-45 | 46-60
+(Kosongkan untuk tampilkan semua data)
+```
+
+---
+
+### 5.10 Kesimpulan Dashboard
+
+Dashboard ini berhasil menjawab 5 pertanyaan bisnis utama yang ditetapkan di awal proyek:
+
+| Pertanyaan Bisnis | Jawaban dari Dashboard |
+|---|---|
+| Faktor apa yang paling mempengaruhi attrition? | Overtime (31.9%), usia muda (38%), gaji rendah (28.7%) |
+| Ada pola per departemen/role? | Sales & Lab Technician paling kritis |
+| Profil karyawan berisiko tinggi? | Terlihat di tabel Top 50 High Risk |
+| Seberapa akurat prediksi model? | Recall 0.75, ROC-AUC 0.83 |
+| Intervensi HR yang efektif? | Kontrol overtime, naikkan gaji < 3K, program retensi muda |
+
+---
