@@ -2,20 +2,6 @@
 ## HR Analytics — Employee Attrition
 ### PT Jaya Jaya Maju | Data Science Project 2025
 
----
-
-## Ringkasan Eksekutif
-
-| Metrik | Nilai |
-|---|---|
-| Total Karyawan | 1.470 |
-| Attrition Rate Aktual | **16,9%** ⚠️ |
-| Target Maksimal Attrition | 10% |
-| Data Berlabel (Attrition) | 1.058 baris |
-| Data Tidak Berlabel | 412 baris |
-
----
-
 ## 1. Latar Belakang Bisnis
 
 PT Jaya Jaya Maju merupakan perusahaan multinasional yang bergerak di bidang industri manufaktur dan layanan korporasi. Perusahaan ini berdiri sejak tahun 2000 dan telah berkembang menjadi salah satu pemain besar di industri nasional dengan lebih dari 1.000 karyawan yang tersebar di berbagai wilayah di Indonesia.
@@ -83,9 +69,8 @@ Proyek ini dirancang sebagai proyek *end-to-end data science* yang mencakup selu
 |---|---|---|---|
 | 1 | Data Understanding | Eksplorasi awal dataset: shape, tipe data, distribusi, missing values | Selesai di awal proyek |
 | 2 | Data Preparation | Handling missing values, encoding, feature selection, train-test split | Google Colab |
-| 3 | Exploratory Data Analysis | Visualisasi distribusi attrition per faktor: departemen, usia, gaji, OT, kepuasan | Google Colab + Dashboard |
-| 4 | Machine Learning Model | Membangun model prediksi attrition (klasifikasi biner: 0 = stay, 1 = resign) | Google Colab |
-| 5 | Model Evaluation | Mengukur performa model: Accuracy, Precision, Recall, F1-Score, ROC-AUC | Google Colab |
+| 3 | Modeling | Membangun model prediksi attrition (klasifikasi biner: 0 = stay, 1 = resign) | Google Colab |
+| 5 | Evaluation | Mengukur performa model: Accuracy, Precision, Recall, F1-Score, ROC-AUC | Google Colab |
 | 6 | Business Dashboard | Dashboard interaktif untuk monitoring faktor attrition secara real-time | Metabase / Tableau |
 | 7 | Rekomendasi Bisnis | Actionable insight berbasis hasil model dan EDA untuk tim HR | Laporan akhir |
 
@@ -107,102 +92,9 @@ Proyek ini dirancang sebagai proyek *end-to-end data science* yang mencakup selu
 
 | Komponen | Target |
 |---|---|
-| Model ML | ROC-AUC ≥ 0,80 dan Recall ≥ 0,75 |
+| Model ML | ROC-AUC ≥ 0,80 |
 | Business Dashboard | Minimal 6 dimensi analisis attrition secara interaktif |
 | Rekomendasi Bisnis | Minimal 5 rekomendasi konkret dan terukur |
 
 ---
 
-## 4. Metodologi
-
-Proyek ini menggunakan kerangka kerja **CRISP-DM** (*Cross-Industry Standard Process for Data Mining*) yang disesuaikan dengan kebutuhan proyek HR analytics ini.
-
-| Fase | Nama Tahapan | Aktivitas Utama |
-|---|---|---|
-| 1 | Business Understanding | Identifikasi masalah, tujuan bisnis, dan cakupan proyek |
-| 2 | Data Understanding | Eksplorasi dataset: dimensi, tipe data, statistik deskriptif, missing values |
-| 3 | Data Preparation | Cleaning, encoding, feature engineering, train-test split (80:20) |
-| 4 | Modeling | Training model: Logistic Regression, Random Forest, XGBoost |
-| 5 | Evaluation | Accuracy, Precision, Recall, F1-Score, ROC-AUC, Confusion Matrix |
-| 6 | Deployment | Business dashboard + laporan rekomendasi HR |
-
-```
-Business         Data            Data           Modeling       Evaluation     Deployment
-Understanding -> Understanding -> Preparation ->           ->            ->
-    [1]             [2]             [3]            [4]            [5]           [6]
-```
-
----
-
-## 5. Dataset Overview
-
-Dataset yang digunakan dalam proyek ini adalah data karyawan internal PT Jaya Jaya Maju.
-
-### 5.1 Informasi Dataset
-
-| Atribut | Detail |
-|---|---|
-| Jumlah baris | 1.470 |
-| Jumlah kolom | 35 |
-| Target variabel | `Attrition` (0 = stay, 1 = resign) |
-| Missing values | 412 baris pada kolom `Attrition` |
-
-### 5.2 Daftar Fitur
-
-| Kolom | Tipe | Keterangan |
-|---|---|---|
-| `EmployeeId` | int | ID unik karyawan |
-| `Age` | int | Usia karyawan |
-| `Attrition` | float | Target: 0 = stay, 1 = resign, NaN = unlabeled |
-| `BusinessTravel` | str | Frekuensi perjalanan dinas |
-| `DailyRate` | int | Tarif harian |
-| `Department` | str | Departemen karyawan |
-| `DistanceFromHome` | int | Jarak rumah ke kantor (km) |
-| `Education` | int | Tingkat pendidikan (1–5) |
-| `EducationField` | str | Bidang pendidikan |
-| `EnvironmentSatisfaction` | int | Kepuasan lingkungan kerja (1–4) |
-| `Gender` | str | Jenis kelamin |
-| `HourlyRate` | int | Tarif per jam |
-| `JobInvolvement` | int | Keterlibatan dalam pekerjaan (1–4) |
-| `JobLevel` | int | Level jabatan (1–5) |
-| `JobRole` | str | Peran/jabatan karyawan |
-| `JobSatisfaction` | int | Kepuasan kerja (1–4) |
-| `MaritalStatus` | str | Status pernikahan |
-| `MonthlyIncome` | int | Pendapatan bulanan |
-| `MonthlyRate` | int | Tarif bulanan |
-| `NumCompaniesWorked` | int | Jumlah perusahaan sebelumnya |
-| `OverTime` | str | Status lembur (Yes/No) |
-| `PercentSalaryHike` | int | Persentase kenaikan gaji |
-| `PerformanceRating` | int | Rating performa (1–4) |
-| `RelationshipSatisfaction` | int | Kepuasan hubungan kerja (1–4) |
-| `StockOptionLevel` | int | Level opsi saham (0–3) |
-| `TotalWorkingYears` | int | Total tahun pengalaman kerja |
-| `TrainingTimesLastYear` | int | Frekuensi pelatihan tahun lalu |
-| `WorkLifeBalance` | int | Keseimbangan kerja-hidup (1–4) |
-| `YearsAtCompany` | int | Lama bekerja di perusahaan |
-| `YearsInCurrentRole` | int | Lama di peran saat ini |
-| `YearsSinceLastPromotion` | int | Tahun sejak promosi terakhir |
-| `YearsWithCurrManager` | int | Lama bersama manajer saat ini |
-| `EmployeeCount` | int | ⚠️ Konstan (nilai = 1) — akan di-drop |
-| `Over18` | str | ⚠️ Konstan (nilai = 'Y') — akan di-drop |
-| `StandardHours` | int | ⚠️ Konstan (nilai = 80) — akan di-drop |
-
-### 5.3 Temuan Awal (Preliminary Findings)
-
-Berdasarkan eksplorasi awal dataset, ditemukan beberapa faktor yang berkorelasi tinggi dengan attrition:
-
-| Faktor | Kondisi Berisiko Tinggi | Attrition Rate |
-|---|---|---|
-| OverTime | Yes | 31,9% |
-| JobRole | Sales Representative | 43,1% |
-| Age Group | 18–25 tahun | 37,2% |
-| MonthlyIncome | < 3.000 | 28,7% |
-| MaritalStatus | Single | 26,7% |
-| BusinessTravel | Travel Frequently | 24,9% |
-| JobInvolvement | Level 1 (Rendah) | 40,0% |
-| EnvironmentSatisfaction | Level 1 (Rendah) | 27,3% |
-
----
-
-*Dokumen ini merupakan bagian dari proyek HR Analytics PT Jaya Jaya Maju.*
-*Dibuat dengan pendekatan CRISP-DM | Data Science Project 2025*
