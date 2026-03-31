@@ -63,8 +63,6 @@ Proyek ini diarahkan untuk menjawab pertanyaan-pertanyaan analitik berikut:
 
 Proyek ini dirancang sebagai proyek *end-to-end data science* yang mencakup seluruh tahapan dari pemahaman data hingga menghasilkan rekomendasi bisnis yang *actionable*.
 
-### 3.1 Deliverable Proyek
-
 | No. | Komponen | Deskripsi | Keterangan |
 |---|---|---|---|
 | 1 | Data Understanding | Eksplorasi awal dataset: shape, tipe data, distribusi, missing values | Selesai di awal proyek |
@@ -73,13 +71,6 @@ Proyek ini dirancang sebagai proyek *end-to-end data science* yang mencakup selu
 | 5 | Evaluation | Mengukur performa model: Accuracy, Precision, Recall, F1-Score, ROC-AUC | Google Colab |
 | 6 | Business Dashboard | Dashboard interaktif untuk monitoring faktor attrition secara real-time | Metabase / Tableau |
 | 7 | Rekomendasi Bisnis | Actionable insight berbasis hasil model dan EDA untuk tim HR | Laporan akhir |
-
-### 3.2 Batasan Proyek (*Out of Scope*)
-
-- Implementasi perubahan kebijakan HR secara langsung — proyek ini hanya memberikan rekomendasi berbasis data.
-- Pengumpulan data primer tambahan di luar dataset yang telah disediakan perusahaan.
-- Pengembangan sistem HR berbasis produksi (*production-ready system*) — fokus pada analisis dan prototipe.
-- Analisis finansial mendalam terkait biaya attrition — hanya estimasi kualitatif.
 
 ---
 
