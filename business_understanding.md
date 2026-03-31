@@ -202,7 +202,7 @@ docker run -p 3000:3000 --name metabase metabase/metabase:v0.46.4
 
 #### 4.3.1 Gambaran Umum
 
-Inference script ini digunakan untuk **memprediksi risiko attrition karyawan baru** menggunakan model Logistic Regression yang telah dilatih sebelumnya. Script memuat model dan preprocessing artifacts yang tersimpan, lalu menerapkannya pada data baru tanpa perlu melatih ulang model.
+Inference script ini digunakan untuk **memprediksi risiko attrition karyawan baru** menggunakan model XGBoost yang telah dilatih sebelumnya. Script memuat model dan preprocessing artifacts yang tersimpan, lalu menerapkannya pada data baru tanpa perlu melatih ulang model.
 
 ```
 Data Karyawan Baru (CSV)
@@ -224,7 +224,7 @@ Data Karyawan Baru (CSV)
 
 #### 4.3.2 Prasyarat
 
-##### 4.3.2.1 File yang Dibutuhkan
+#### 4.3.2.1 File yang Dibutuhkan
 
 Pastikan file berikut tersedia di direktori yang sama dengan notebook:
 
@@ -233,14 +233,14 @@ Pastikan file berikut tersedia di direktori yang sama dengan notebook:
 | `model_artifacts.pkl` | Model + preprocessing artifacts (hasil dari tahap modeling) |
 | `new_employee_data.csv` | Data karyawan baru yang ingin diprediksi *(opsional)* |
 
-##### 4.3.2.2 Struktur `model_artifacts.pkl`
+#### 4.3.2.2 Struktur `model_artifacts.pkl`
 
 File ini berisi semua komponen yang diperlukan untuk inference:
 
 ```python
 model_artifacts = {
-    'best_model'                  : # Model Logistic Regression terlatih
-    'best_model_name'             : # Nama model ('Logistic Regression')
+    'best_model'                  : # Model XGBoost terlatih
+    'best_model_name'             : # Nama model ('XGBoost')
     'scaler'                      : # StandardScaler (fit pada training data)
     'le_dict'                     : # Label Encoder untuk kolom binary
     'feature_columns'             : # Daftar 46 fitur setelah encoding
@@ -254,7 +254,7 @@ model_artifacts = {
 
 ---
 
-##### 4.3.2.3  Cell 1 — Install & Import Library
+#### 4.3.2.3  Cell 1 — Install & Import Library
 
 ```python
 # Jalankan jika belum install
@@ -270,7 +270,7 @@ print("✅ Library siap!")
 
 ---
 
-##### 4.3.2.4  Cell 2 — Muat Model & Preprocessing Artifacts
+#### 4.3.2.4  Cell 2 — Muat Model & Preprocessing Artifacts
 
 ```python
 # ============================================================
@@ -298,8 +298,7 @@ print(f"✅ Model terbaik '{best_model_name}' dan preprocessing artifacts berhas
 ```
 ---
 
-##### 4.3.2.5 Cell 3 — Load Data Karyawan Baru
-
+#### 4.3.2.5 Cell 3 — Load Data Karyawan Baru
 
 ```python
 # ============================================================
@@ -345,7 +344,7 @@ print(f"Kolom yang diperlukan: {len(kolom_wajib)} kolom")
 
 ---
 
-##### 4.3.2.5 Cell 4 — Preprocessing Data Baru
+#### 4.3.2.6 Cell 4 — Preprocessing Data Baru
 
 ```python
 # ============================================================
@@ -404,7 +403,7 @@ display(X_new_unseen_processed.head())
 ```
 ---
 
-##### 4.3.2.6 Cell 5 — Prediksi Attrition
+#### 4.3.2.7 Cell 5 — Prediksi Attrition & Tampilkan Hasil
 
 ```python
 # ============================================================
@@ -435,50 +434,29 @@ print(f"Total karyawan yang diprediksi 'High Risk': {len(high_risk_new)} orang")
 ```
 ---
 
-## Cell 6 — Tampilkan Hasil & Export
+#### 4.3.2.7 Cell 6 — Export Hasil
 
 ```python
 # ============================================================
 # Tampilkan karyawan berisiko tinggi & simpan hasil
 # ============================================================
 
-# Top karyawan High Risk
-high_risk = (df_result[df_result['Risk_Level'] == 'High Risk']
-             .sort_values('Resign_Probability', ascending=False))
+# Ekspor hasil prediksi ke file CSV
+# Anda bisa mengganti 'prediction_results.csv' dengan nama file yang diinginkan
+output_filename = 'prediction_results.csv'
+df_new_unseen.to_csv(output_filename, index=False)
 
-print(f"🚨 Karyawan High Risk: {len(high_risk)} orang")
-print(f"\nTop 10 karyawan dengan probabilitas resign tertinggi:")
-display(high_risk[[
-    'Age', 'Department', 'JobRole', 'MonthlyIncome',
-    'OverTime', 'MaritalStatus',
-    'Resign_Probability', 'Risk_Level'
-]].head(10))
-
-# Simpan seluruh hasil prediksi ke CSV
-df_result.to_csv('hasil_prediksi_attrition.csv', index=False)
-print(f"\n✅ Hasil tersimpan di 'hasil_prediksi_attrition.csv'")
-print(f"   Total baris : {len(df_result)}")
-print(f"   Total kolom : {df_result.shape[1]}")
+print(f"✅ Hasil prediksi berhasil diekspor ke '{output_filename}'")
+print("File dapat diunduh dari panel File di sebelah kiri Colab.")
 ```
 
 ---
 
-## Troubleshooting
+#### 4.3.2.8 Catatan Penting
 
-| Error | Penyebab | Solusi |
-|---|---|---|
-| `FileNotFoundError: model_artifacts.pkl` | File pkl tidak ada | Jalankan dulu notebook modeling hingga cell save model |
-| `KeyError: 'Gender'` | Kolom tidak ada di data baru | Pastikan semua 30 kolom wajib ada di CSV |
-| `ValueError: unknown categories` | Ada nilai baru yang tidak ada di training | Cek nilai unik kolom kategori — harus sama dengan training |
-| `shape mismatch` | Jumlah fitur tidak cocok | Pastikan `reindex(columns=feature_columns)` dijalankan |
-
----
-
-## Catatan Penting
-
-> Model yang digunakan adalah **Logistic Regression** dengan performa:
-> - Recall : **0.75** (75% karyawan resign berhasil terdeteksi)
-> - ROC-AUC: **0.83**
+> Model yang digunakan adalah **XGBoost** dengan performa:
+> - Recall : **0.52** (75% karyawan resign berhasil terdeteksi)
+> - ROC-AUC: **0.81**
 >
 > Model ini dilatih menggunakan data PT Jaya Jaya Maju.
 > Untuk data perusahaan lain atau periode berbeda, model perlu **dilatih ulang**.
