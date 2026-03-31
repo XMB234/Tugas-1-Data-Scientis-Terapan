@@ -81,15 +81,119 @@ Proyek ini dirancang sebagai proyek *end-to-end data science* yang mencakup selu
 - Pengembangan sistem HR berbasis produksi (*production-ready system*) — fokus pada analisis dan prototipe.
 - Analisis finansial mendalam terkait biaya attrition — hanya estimasi kualitatif.
 
-### 3.3 Asumsi Proyek
+---
 
-- Dataset yang disediakan merepresentasikan kondisi aktual karyawan perusahaan secara akurat.
-- Kolom `Attrition` bernilai `1` = karyawan telah resign, `0` = karyawan masih aktif; baris dengan nilai kosong diasumsikan sebagai data yang belum dilabeli.
-- Kolom `EmployeeCount`, `Over18`, dan `StandardHours` dikonfirmasi sebagai fitur konstan dan akan di-drop pada tahap preprocessing.
-- Model yang dibangun ditujukan untuk mendukung keputusan HR, bukan sebagai pengganti pertimbangan manusiawi.
+## 4. Persiapan
+### 4.1 Sumber Data
+
+| Atribut | Detail |
+|---|---|
+| Nama Dataset | Employee Data — PT Jaya Jaya Maju |
+| Sumber | Dicoding Academy Dataset (GitHub) |
+| URL | [employee_data.csv](https://github.com/dicodingacademy/dicoding_dataset/blob/main/employee/employee_data.csv) |
+| Jumlah Baris | 1.470 |
+| Jumlah Kolom | 35 |
+| Target Variabel | `Attrition` (0 = Stay, 1 = Resign) |
+| Missing Values | 412 baris pada kolom `Attrition` |
+| Lisensi | Dicoding Academy |
+
+```python
+DATASET_URL = (
+    "https://raw.githubusercontent.com/dicodingacademy/dicoding_dataset"
+    "/bce7a57a496d083716138922bc5839b5c30fa4ea/employee/employee_data.csv"
+)
+```
 
 ---
 
+### 4.2 Setup Environment
+
+#### 4.2.1 Prasyarat
+
+| Tools | Kegunaan |
+|---|---|
+| Python | Bahasa pemrograman utama |
+| Google Colab / Jupyter | Environment notebook |
+| Docker Desktop | Menjalankan Metabase |
+| Metabase | Business Dashboard |
+
+---
+
+#### 4.2.2 Instalasi Library
+
+Buat file `requirements.txt` dengan isi berikut:
+
+```
+imbalanced-learn==0.14.1
+lightgbm==4.6.0
+matplotlib==3.10.0
+missingno==0.5.2
+numpy==2.0.2
+pandas==2.2.2
+scikit-learn==1.6.1
+scikit-plot==0.3.7
+seaborn==0.13.2
+shap==0.51.0
+xgboost==3.2.0
+```
+
+Install semua library sekaligus:
+
+```bash
+pip install -r requirements.txt
+```
+
+Atau install satu per satu di Google Colab:
+
+```python
+!pip install -q imbalanced-learn==0.14.1
+!pip install -q lightgbm==4.6.0
+!pip install -q matplotlib==3.10.0
+!pip install -q missingno==0.5.2
+!pip install -q numpy==2.0.2
+!pip install -q pandas==2.2.2
+!pip install -q scikit-learn==1.6.1
+!pip install -q scikit-plot==0.3.7
+!pip install -q seaborn==0.13.2
+!pip install -q shap==0.51.0
+!pip install -q xgboost==3.2.0
+```
+
+---
+
+#### 4.2.3 Deskripsi Library
+
+| Library | Versi | Kegunaan |
+|---|---|---|
+| `pandas` | 2.2.2 | Manipulasi dan analisis data tabular |
+| `numpy` | 2.0.2 | Operasi array dan komputasi numerik |
+| `matplotlib` | 3.10.0 | Visualisasi data dasar |
+| `seaborn` | 0.13.2 | Visualisasi statistik berbasis matplotlib |
+| `missingno` | 0.5.2 | Visualisasi missing values |
+| `scikit-learn` | 1.6.1 | Preprocessing, modeling, dan evaluasi ML |
+| `imbalanced-learn` | 0.14.1 | Penanganan imbalanced dataset (SMOTE) |
+| `xgboost` | 3.2.0 | Model XGBoost classifier |
+| `lightgbm` | 4.6.0 | Model LightGBM classifier |
+| `shap` | 0.51.0 | Model explainability (feature importance) |
+| `scikit-plot` | 0.3.7 | Visualisasi ROC curve dan confusion matrix |
+
+---
+
+#### 4.2.4 Setup Metabase (Business Dashboard)
+
+```bash
+# Pull image Metabase v0.46.4
+docker pull metabase/metabase:v0.46.4
+
+# Jalankan container
+docker run -p 3000:3000 --name metabase metabase/metabase:v0.46.4
+
+# Akses via browser
+# http://localhost:3000
+# Email    : root@mail.com
+# Password : root123
+```
+---
 ## 5. Business Dashboard
 
 ### 5.1 Akses Dashboard
