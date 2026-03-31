@@ -1,6 +1,13 @@
-# Business Understanding
-## HR Analytics — Employee Attrition
-### PT Jaya Jaya Maju | Data Science Project 2025
+# Projek 1 Penerapan Data Science
+
+- Nama : Al Hadi Busra
+- Username : alhadi78
+- Email Akun Dicoding : alhadibusra1002@gmail.com
+---
+
+## Business Understanding
+### HR Analytics — Employee Attrition
+
 
 ## 1. Latar Belakang Bisnis
 
