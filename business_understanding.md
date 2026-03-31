@@ -104,7 +104,7 @@ Proyek ini dirancang sebagai proyek *end-to-end data science* yang mencakup selu
 
 ### 5.2 Gambaran Umum Dashboard
 
-Dashboard ini dirancang untuk membantu **Manajer HR PT Jaya Jaya Maju** dalam memonitor dan memahami faktor-faktor yang mempengaruhi tingginya attrition rate perusahaan. Dashboard terdiri dari **13 visualisasi** yang dibagi ke dalam 5 bagian utama, mencakup data **1.470 karyawan** — gabungan dari 1.058 data berlabel aktual dan 412 data hasil prediksi model Machine Learning (Logistic Regression, Recall=0.75, ROC-AUC=0.83).
+Dashboard ini dirancang untuk membantu **Manajer HR PT Jaya Jaya Maju** dalam memonitor dan memahami faktor-faktor yang mempengaruhi tingginya attrition rate perusahaan. Dashboard terdiri dari **13 visualisasi** yang dibagi ke dalam 5 bagian utama, mencakup data **1.470 karyawan** — gabungan dari 1.058 data berlabel aktual dan 412 data hasil prediksi model Machine Learning (XGBoost, Recall=0.52, ROC-AUC=0.81).
 
 ---
 
@@ -256,12 +256,14 @@ Dashboard ini berhasil menjawab 5 pertanyaan bisnis utama yang ditetapkan di awa
 | Faktor apa yang paling mempengaruhi attrition? | Overtime (31.9%), usia muda (38%), gaji rendah (28.7%) |
 | Ada pola per departemen/role? | Sales & Lab Technician paling kritis |
 | Profil karyawan berisiko tinggi? | Terlihat di tabel Top 50 High Risk |
-| Seberapa akurat prediksi model? | Recall 0.75, ROC-AUC 0.83 |
+| Seberapa akurat prediksi model? | Recall 0.52, ROC-AUC 0.83 |
 | Intervensi HR yang efektif? | Kontrol overtime, naikkan gaji < 3K, program retensi muda |
 
 ---
 
 ## 6. Conclusion
+
+Berdasarkan analisis data 1.470 karyawan PT Jaya Jaya Maju, attrition rate perusahaan tercatat sebesar 16,9% — jauh melampaui target maksimal 10%. Faktor-faktor utama yang mempengaruhi tingginya attrition rate adalah overtime (karyawan yang lembur memiliki attrition 31,9% vs 10,8% yang tidak lembur), job role (Sales Representative 43,1%), usia muda 18–25 tahun (37,2%), masa kerja kurang dari 1 tahun (34,6%), serta gaji rendah di bawah 3.000 (28,7%). Model Machine Learning XGBoost berhasil dibangun dengan performa Recall 0,52 dan ROC-AUC 0,81 sehingga model mampu mendeteksi 52% karyawan yang berisiko resign sebelum keputusan tersebut diambil. Untuk mengatasi permasalahan ini, perusahaan direkomendasikan untuk segera mengendalikan kebijakan overtime, memperkuat program retensi karyawan muda dan baru, melakukan salary benchmarking, meningkatkan job involvement, serta memperjelas jalur karier — dengan target penurunan attrition rate dari 16,9% menjadi di bawah 10% dalam 12 bulan.
 
 ---
 
