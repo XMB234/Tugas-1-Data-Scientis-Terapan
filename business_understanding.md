@@ -194,6 +194,297 @@ docker run -p 3000:3000 --name metabase metabase/metabase:v0.46.4
 # Password : root123
 ```
 ---
+
+### 4.3 Panduan Penggunaan Inference Script
+### Prediksi Attrition pada Data Karyawan Baru
+
+---
+
+#### 4.3.1 Gambaran Umum
+
+Inference script ini digunakan untuk **memprediksi risiko attrition karyawan baru** menggunakan model Logistic Regression yang telah dilatih sebelumnya. Script memuat model dan preprocessing artifacts yang tersimpan, lalu menerapkannya pada data baru tanpa perlu melatih ulang model.
+
+```
+Data Karyawan Baru (CSV)
+        │
+        ▼
+[1] Muat Model & Artifacts   → model_artifacts.pkl
+        │
+        ▼
+[2] Preprocessing            → Encoding + Scaling
+        │
+        ▼
+[3] Prediksi                 → Attrition_Predicted + Resign_Probability
+        │
+        ▼
+[4] Output                   → Risk Level (Low / Medium / High)
+```
+
+---
+
+#### 4.3.2 Prasyarat
+
+##### 4.3.2.1 File yang Dibutuhkan
+
+Pastikan file berikut tersedia di direktori yang sama dengan notebook:
+
+| File | Keterangan |
+|---|---|
+| `model_artifacts.pkl` | Model + preprocessing artifacts (hasil dari tahap modeling) |
+| `new_employee_data.csv` | Data karyawan baru yang ingin diprediksi *(opsional)* |
+
+##### 4.3.2.2 Struktur `model_artifacts.pkl`
+
+File ini berisi semua komponen yang diperlukan untuk inference:
+
+```python
+model_artifacts = {
+    'best_model'                  : # Model Logistic Regression terlatih
+    'best_model_name'             : # Nama model ('Logistic Regression')
+    'scaler'                      : # StandardScaler (fit pada training data)
+    'le_dict'                     : # Label Encoder untuk kolom binary
+    'feature_columns'             : # Daftar 46 fitur setelah encoding
+    'numeric_cols'                : # Kolom numerik yang di-scale
+    'ohe_and_binary_encoded_cols' : # Kolom hasil OHE & binary encoding
+}
+```
+
+> **Penting:** `model_artifacts.pkl` dihasilkan dari notebook modeling.
+> Pastikan file ini ada sebelum menjalankan inference script.
+
+---
+
+##### 4.3.2.3  Cell 1 — Install & Import Library
+
+```python
+# Jalankan jika belum install
+!pip install -q pandas scikit-learn
+
+import pickle
+import pandas as pd
+import warnings
+warnings.filterwarnings('ignore')
+
+print("✅ Library siap!")
+```
+
+---
+
+##### 4.3.2.4  Cell 2 — Muat Model & Preprocessing Artifacts
+
+```python
+# ============================================================
+# Muat model dan semua preprocessing artifacts
+# Pastikan 'model_artifacts.pkl' ada di direktori yang sama
+# ============================================================
+
+import pickle
+import pandas as pd
+
+# Muat model dan preprocessing artifacts yang telah disimpan
+# Pastikan path ke 'model_artifacts.pkl' disesuaikan jika file tidak berada di direktori yang sama
+with open('model_artifacts.pkl', 'rb') as f:
+    model_artifacts = pickle.load(f)
+
+best_model      = model_artifacts['best_model']
+best_model_name = model_artifacts['best_model_name']
+scaler          = model_artifacts['scaler']
+le_dict         = model_artifacts['le_dict']
+feature_columns = model_artifacts['feature_columns']
+numeric_cols    = model_artifacts['numeric_cols']
+ohe_and_binary_encoded_cols = model_artifacts['ohe_and_binary_encoded_cols'] # Corrected variable name
+
+print(f"✅ Model terbaik '{best_model_name}' dan preprocessing artifacts berhasil dimuat!")
+```
+---
+
+##### 4.3.2.5 Cell 3 — Load Data Karyawan Baru
+
+
+```python
+# ============================================================
+# Struktur kolom harus sama dengan data training
+# (tanpa kolom Attrition)
+# ============================================================
+
+try:
+    df_new_external = pd.read_csv('new_employee_data.csv')
+    print(f"✅ Data baru dari 'new_employee_data.csv' berhasil dimuat. Shape: {df_new_external.shape}")
+except FileNotFoundError:
+    print("❌ File 'new_employee_data.csv' tidak ditemukan. Pastikan Anda mengunggahnya atau menyediakan path yang benar.")
+    print("Menggunakan `df_unlabeled_backup` sebagai data baru untuk demo ini.")
+    df_new_external = df_unlabeled_backup.copy()
+
+df_new_unseen = df_new_external.copy()
+
+print(f"✅ Data baru (df_new_unseen) siap untuk diproses lebih lanjut. Shape: {df_new_unseen.shape}")
+print("Preview 5 baris pertama data baru:")
+```
+
+```
+
+### Struktur kolom yang diperlukan
+
+Data baru harus memiliki kolom berikut (tanpa kolom `Attrition`):
+
+```python
+kolom_wajib = [
+    'Age', 'BusinessTravel', 'DailyRate', 'Department',
+    'DistanceFromHome', 'Education', 'EducationField',
+    'EnvironmentSatisfaction', 'Gender', 'HourlyRate',
+    'JobInvolvement', 'JobLevel', 'JobRole', 'JobSatisfaction',
+    'MaritalStatus', 'MonthlyIncome', 'MonthlyRate',
+    'NumCompaniesWorked', 'OverTime', 'PercentSalaryHike',
+    'PerformanceRating', 'RelationshipSatisfaction', 'StockOptionLevel',
+    'TotalWorkingYears', 'TrainingTimesLastYear', 'WorkLifeBalance',
+    'YearsAtCompany', 'YearsInCurrentRole', 'YearsSinceLastPromotion',
+    'YearsWithCurrManager'
+]
+print(f"Kolom yang diperlukan: {len(kolom_wajib)} kolom")
+```
+
+---
+
+##### 4.3.2.5 Cell 4 — Preprocessing Data Baru
+
+```python
+# ============================================================
+# Terapkan preprocessing yang SAMA PERSIS dengan training:
+# 1. Label Encoding untuk kolom binary (Gender, OverTime)
+# 2. One-Hot Encoding untuk kolom nominal
+# 3. Align kolom dengan feature_columns training
+# 4. StandardScaler untuk kolom numerik
+# ============================================================
+
+# Identifikasi kolom kategorikal dan numerik di data baru
+# Gunakan le_dict yang sudah dimuat untuk label encoding
+for col, le in le_dict.items():
+    if col in df_new_unseen.columns:
+        df_new_unseen[col] = le.transform(df_new_unseen[col])
+
+# Lakukan One-Hot Encoding untuk kolom nominal
+# Dapatkan kembali daftar kolom nominal dari artifacts untuk memastikan konsistensi
+nominal_cols = [c for c in ohe_and_binary_encoded_cols if not (c in le_dict or c in ['Gender', 'OverTime'])]
+
+# Rekonstruksi kolom nominal asli dari daftar yang telah ditentukan jika diperlukan
+# Bagian ini perlu kuat jika df_new_unseen memiliki kolom yang berbeda
+
+# Identifikasi kolom kategorikal asli yang telah di-one-hot encode
+original_nominal_features = []
+for col_name in feature_columns:
+    for prefix in ['BusinessTravel_', 'Department_', 'EducationField_', 'JobRole_', 'MaritalStatus_']:
+        if col_name.startswith(prefix):
+            original_nominal_features.append(prefix[:-1]) # Tambahkan nama fitur dasar
+            break
+
+original_nominal_features = list(set(original_nominal_features)) # Dapatkan nama dasar yang unik
+
+# Pastikan original_nominal_features ada di df_new_unseen sebelum get_dummies
+for col in original_nominal_features:
+    if col not in df_new_unseen.columns:
+        # Tangani kasus di mana kolom mungkin hilang di data baru (misalnya, jika semuanya nol)
+        # Untuk saat ini, kita mengasumsikan semua kolom asli ada.
+        pass
+
+df_new_unseen_encoded = pd.get_dummies(df_new_unseen, columns=original_nominal_features, drop_first=False)
+
+# Selaraskan kolom agar sama persis dengan X (data pelatihan) menggunakan feature_columns yang disimpan
+X_new_unseen_processed = df_new_unseen_encoded.reindex(columns=feature_columns, fill_value=0)
+
+# Ubah kolom boolean yang dibuat oleh get_dummies menjadi integer
+for col in X_new_unseen_processed.select_dtypes(include='bool').columns:
+    X_new_unseen_processed[col] = X_new_unseen_processed[col].astype(int)
+
+# Terapkan scaling pada fitur numerik
+X_new_unseen_processed[numeric_cols] = scaler.transform(X_new_unseen_processed[numeric_cols])
+
+print(f"✅ Data baru berhasil dipreprocessing. Shape: {X_new_unseen_processed.shape}")
+print("Preview data baru setelah preprocessing:")
+display(X_new_unseen_processed.head())
+```
+---
+
+##### 4.3.2.6 Cell 5 — Prediksi Attrition
+
+```python
+# ============================================================
+# Lakukan prediksi menggunakan model yang sudah dimuat
+# ============================================================
+
+y_new_pred = best_model.predict(X_new_unseen_processed)
+y_new_prob = best_model.predict_proba(X_new_unseen_processed)[:, 1]
+
+df_new_unseen['Attrition_Predicted'] = y_new_pred
+df_new_unseen['Resign_Probability']  = y_new_prob.round(4)
+df_new_unseen['Risk_Level'] = pd.cut(
+    y_new_prob,
+    bins   = [0, 0.3, 0.6, 1.0],
+    labels = ['Low Risk', 'Medium Risk', 'High Risk']
+)
+
+print("✅ Prediksi berhasil dilakukan pada data baru.")
+print("Preview hasil prediksi (top 10 karyawan dengan probabilitas resign tertinggi):")
+
+high_risk_new = (df_new_unseen[df_new_unseen['Risk_Level'] == 'High Risk']
+                 .sort_values('Resign_Probability', ascending=False))
+
+display(high_risk_new[['Resign_Probability', 'Risk_Level', 'Age',
+                       'MonthlyIncome', 'OverTime', 'JobRole', 'MaritalStatus']].head(10))
+
+print(f"Total karyawan yang diprediksi 'High Risk': {len(high_risk_new)} orang")
+```
+---
+
+## Cell 6 — Tampilkan Hasil & Export
+
+```python
+# ============================================================
+# Tampilkan karyawan berisiko tinggi & simpan hasil
+# ============================================================
+
+# Top karyawan High Risk
+high_risk = (df_result[df_result['Risk_Level'] == 'High Risk']
+             .sort_values('Resign_Probability', ascending=False))
+
+print(f"🚨 Karyawan High Risk: {len(high_risk)} orang")
+print(f"\nTop 10 karyawan dengan probabilitas resign tertinggi:")
+display(high_risk[[
+    'Age', 'Department', 'JobRole', 'MonthlyIncome',
+    'OverTime', 'MaritalStatus',
+    'Resign_Probability', 'Risk_Level'
+]].head(10))
+
+# Simpan seluruh hasil prediksi ke CSV
+df_result.to_csv('hasil_prediksi_attrition.csv', index=False)
+print(f"\n✅ Hasil tersimpan di 'hasil_prediksi_attrition.csv'")
+print(f"   Total baris : {len(df_result)}")
+print(f"   Total kolom : {df_result.shape[1]}")
+```
+
+---
+
+## Troubleshooting
+
+| Error | Penyebab | Solusi |
+|---|---|---|
+| `FileNotFoundError: model_artifacts.pkl` | File pkl tidak ada | Jalankan dulu notebook modeling hingga cell save model |
+| `KeyError: 'Gender'` | Kolom tidak ada di data baru | Pastikan semua 30 kolom wajib ada di CSV |
+| `ValueError: unknown categories` | Ada nilai baru yang tidak ada di training | Cek nilai unik kolom kategori — harus sama dengan training |
+| `shape mismatch` | Jumlah fitur tidak cocok | Pastikan `reindex(columns=feature_columns)` dijalankan |
+
+---
+
+## Catatan Penting
+
+> Model yang digunakan adalah **Logistic Regression** dengan performa:
+> - Recall : **0.75** (75% karyawan resign berhasil terdeteksi)
+> - ROC-AUC: **0.83**
+>
+> Model ini dilatih menggunakan data PT Jaya Jaya Maju.
+> Untuk data perusahaan lain atau periode berbeda, model perlu **dilatih ulang**.
+
+---
+
 ## 5. Business Dashboard
 
 ### 5.1 Akses Dashboard
